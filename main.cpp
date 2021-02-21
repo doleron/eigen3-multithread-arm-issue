@@ -59,9 +59,11 @@ int main(int argc, char ** argv)
 
     std::thread t0(worker, "t-0");
     //std::thread t1(worker, "t-1");
+    //std::thread t2(worker, "t-2");
 
     t0.join();
     //t1.join();
+    //t2.join();
 
     return 0;
 }

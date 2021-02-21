@@ -46,9 +46,11 @@ Them, uncomment the lines in `main()` to include another thread:
 ```c++
 std::thread t0(worker, "t-0");
 //std::thread t1(worker, "t-1");
+//std::thread t2(worker, "t-2");
 
 t0.join();
 //t1.join();
+//t2.join();
 ```
 
 and compile & run again in order to compare the performance of each individual thread in a multi-thread scenario.
@@ -101,12 +103,55 @@ t-2     2       59.9161 fps     1669 ms
 ^C
 ```
 
-So far, I can reproduce the problem only on ARM processors. Running 1 single thread in ARM 64 bits give me around per thread:
+So far, I can reproduce the problem only on ARM processors. Running 1 single thread in ARM 64 bits give me around 10.000ms per thread:
 
+```
+$ ./test 
+1 eigen threads
+t-0     0       10.0371 fps     9963 ms
+t-0     1       10.3445 fps     9667 ms
+t-0     2       10.8707 fps     9199 ms
+t-0     3       11.0681 fps     9035 ms
+t-0     4       11.1632 fps     8958 ms
+t-0     5       11.1495 fps     8969 ms
+t-0     6       11.1707 fps     8952 ms
+^C
+```
 
+Performance significally drops when I try to run two threads:
 
+```
+$ ./test 
+1 eigen threads
+t-0     0       8.97827 fps     11138 ms
+t-1     0       7.1803 fps      13927 ms
+t-0     1       8.23723 fps     12140 ms
+t-1     1       8.31601 fps     12025 ms
+t-1     2       9.05141 fps     11048 ms
+t-0     2       7.00918 fps     14267 ms
+t-0     3       7.61209 fps     13137 ms
+t-1     3       6.37633 fps     15683 ms
+^C
+```
 
-On ARM 32 bit I have found similar issue. For one thread I got ~17000ms per thread:
+or 3 threads things get worse:
+
+```
+$ ./test 
+1 eigen threads
+t-2     0       5.04821 fps     19809 ms
+t-1     0       4.23621 fps     23606 ms
+t-0     0       4.0868 fps      24469 ms
+t-2     1       4.60936 fps     21695 ms
+t-1     1       4.38808 fps     22789 ms
+t-0     1       4.35047 fps     22986 ms
+t-2     2       4.74631 fps     21069 ms
+t-1     2       4.27204 fps     23408 ms
+t-0     2       4.38231 fps     22819 ms
+^C
+```
+
+On ARM 32 bit I have found similar performance issue. For one thread I got ~17000ms per thread:
 
 ```
 $ ./test 
@@ -145,3 +190,7 @@ t-2     1       2.3411 fps      42715 ms
 t-1     1       2.46245 fps     40610 ms
 ^C
 ```
+
+## Opened issue
+
+I just opened an issue on Eigen official repository for this problem: https://gitlab.com/libeigen/eigen/-/issues/2159

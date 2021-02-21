@@ -10,7 +10,7 @@ Clone eigen 3 from official repository
 $ git clone https://gitlab.com/libeigen/eigen.git
 ```
 
-My current version is the last commit:
+My current version is the last commit right now:
 
 ```
 $ git log -1
@@ -18,30 +18,42 @@ commit 73922b0174f84e78f486eb89de86dffc881acbcb (HEAD -> master, origin/master, 
 Date:   Sat Feb 20 18:56:42 2021 +0100
 ```
 
-### ARM 32 bits
+### Compiling on ARM 32 bits
 
 ```
 $ g++ -march=native -mfpu=neon -mfloat-abi=hard -O3 -DNDEBUG -I eigen/ main.cpp -o test -lpthread
 ```
 
-### ARM 64 bits
+### Compiling on ARM 64 bits
 
 ```
 $ g++ -O3 -DNDEBUG -I eigen/ main.cpp -o test -lpthread
 ```
 
-### Intel 64 bits
+### Compiling on Intel 64 bits
 
 ```
 $ g++ -O3 -DNDEBUG -I eigen/ main.cpp -o test -lpthread
 ```
 
-# Running
+## Running
+
+After compiling
 
 ```
 $ ./test
 ```
-Them, uncomment the lines in `main()` to include another thread:
+
+It would run a single thread and output 1-30 rows with performance data. For example:
+
+```
+$ ./test 
+1 eigen threads
+t-0     0       59.2417 fps     1688 ms
+...
+```
+
+After running using a single thread, you would like to run two or three threads for compare the performance. Thus, uncomment the lines in `main()` to include other threads:
 
 ```c++
 std::thread t0(worker, "t-0");
@@ -55,7 +67,7 @@ t0.join();
 
 and compile & run again in order to compare the performance of each individual thread in a multi-thread scenario.
 
-# Results
+## Results
 
 In my experiments, runnning a single thread on Intel 64 bits results in ~1700ms per cycle:
 
@@ -69,8 +81,7 @@ t-0     3       64.3087 fps     1555 ms
 t-0     4       56.6893 fps     1764 ms
 ^C
 ```
-
-and again ~1600ms running two threads:
+On my intel processor, each thread has the same performance regardless I am running a single one, two or three. For example, if I run two threads I get again ~1600ms:
 
 ```
 $ ./test 
@@ -103,7 +114,9 @@ t-2     2       59.9161 fps     1669 ms
 ^C
 ```
 
-So far, I can reproduce the problem only on ARM processors. Running 1 single thread in ARM 64 bits give me around 10.000ms per thread:
+So, on Intel there is no problem at all. So far, I can reproduce the problem only on ARM processors.
+
+To illustrate it, if I run 1 single thread in ARM 64 bits I get around 10.000ms per cycle:
 
 ```
 $ ./test 
@@ -118,7 +131,7 @@ t-0     6       11.1707 fps     8952 ms
 ^C
 ```
 
-Performance significally drops when I try to run two threads:
+Performance however significally drops when I try to run two threads:
 
 ```
 $ ./test 
@@ -134,7 +147,7 @@ t-1     3       6.37633 fps     15683 ms
 ^C
 ```
 
-or 3 threads things get worse:
+And for 3 threads things get way worse:
 
 ```
 $ ./test 
@@ -151,7 +164,7 @@ t-0     2       4.38231 fps     22819 ms
 ^C
 ```
 
-On ARM 32 bit I have found similar performance issue. For one thread I got ~17000ms per thread:
+On ARM 32 bit I have found similar performance issue. For one thread I got ~17000ms per cycle:
 
 ```
 $ ./test 

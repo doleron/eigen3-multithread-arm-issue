@@ -1,6 +1,8 @@
 # eigen3-multithread-arm-issue
 This repository demonstrates a lock-like issue when running Eigen 3 dense matrix multiplication in parallel on ARM 32 or 64 bit.
 
+NOTE: indeed, I realized that the problem here was the Raspberry PI 4 processor L2 memory bottleneck. Check this answer: https://stackoverflow.com/questions/66303635/performance-drops-when-running-eigen-dense-matrix-multiplications-over-multiple
+
 ## Compiling
 
 ### Pre-requisites
